@@ -11,6 +11,7 @@ import org.example.repository.OrderRepository;
 import org.example.repository.BankRepository;
 import org.example.Service.BankService;
 import org.example.Service.BankTransferService;
+import org.example.Service.StoreService;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
@@ -36,9 +37,6 @@ public class StoreController {
     private BankRepository bankRepository;
 
     @Autowired
-    private BankService bankService;
-
-    @Autowired
     private BankTransferService bankTransferService;
 
     private PasswordEncoder passwordEncoder;
@@ -51,7 +49,7 @@ public class StoreController {
 
     // Register a new user
     @PostMapping("/login")
-    public CustomerResponse<Object> login(@PathVariable String  name, @PathVariable String password) {
+    public CustomerResponse<Object> login(@RequestParam String name, @RequestParam String password) {
         Optional<Customer> optionalCustomer = customerRepository.findByName(name);
 
         if (optionalCustomer.isPresent()) {
@@ -69,7 +67,7 @@ public class StoreController {
 
     // Log in
     @PostMapping("/register")
-    public CustomerResponse<Object> register(@PathVariable String name, @PathVariable String email, @PathVariable String password) {
+    public CustomerResponse<Object> register(@RequestParam String name, @RequestParam String email, @RequestParam String password) {
         if (customerRepository.findByEmail(email).isPresent()) {
             return new CustomerResponse<>("error", "Email is already registered", null);
         }
@@ -113,8 +111,8 @@ public class StoreController {
     }
 
     // Create a payment invoice
-    @PostMapping("/{orderId}/payment")
-    public CustomerResponse<Object> createPayment(@PathVariable Long orderId, @RequestParam Long fromAccountId) {
+    @PostMapping("/{customerId}/{orderId}/payment")
+    public CustomerResponse<Object> createPayment(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         BankService bankService = new BankService();
         try {
             Long toAccountId = this.getStoreAccountId();
@@ -125,8 +123,8 @@ public class StoreController {
         }
     }
 
-    @PostMapping("/{orderId}/refund")
-    public RefundResponse refundOrder(@PathVariable Long orderId, @RequestParam Long fromAccountId) {
+    @PostMapping("/{customerId}/{orderId}/refund")
+    public RefundResponse refundOrder(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
 
         if (optionalOrder.isPresent()) {
@@ -155,8 +153,8 @@ public class StoreController {
         }
     }
 
-    @PostMapping("/checkOrderStatus/{orderId}")
-    public OrderStatusResponse checkOrderStatus(@PathVariable Long orderId) {
+    @PostMapping("/{customerId}/checkOrderStatus/{orderId}")
+    public OrderStatusResponse checkOrderStatus(@PathVariable Long customerId, @PathVariable Long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
 
         if (optionalOrder.isPresent()) {
