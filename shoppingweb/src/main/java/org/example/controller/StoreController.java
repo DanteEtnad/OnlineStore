@@ -131,12 +131,16 @@ public class StoreController {
             Order order = optionalOrder.get();
 
             // Check if the order is eligible for a refund (paid)
-            if (!order.getStatus().equals("paid")) {
+            if (!order.getStatus().equals("paying") || !order.getStatus().equals("payed")) {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
-            // Assuming you have a method to get the store's account
-            Long storeAccountId = getStoreAccountId(); // You need to implement this method
+            if(!order.getBankTransfer().getStatus().equals("success")){
+                return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
+            }
+
+            // Get the store's account
+            Long storeAccountId = getStoreAccountId();
             Double amountToRefund = order.getTotalAmount();
 
             // Create the refund transaction
@@ -153,6 +157,7 @@ public class StoreController {
         }
     }
 
+    //Only by calling this function can the order status be changed to paid, and then the deliveryCo will detect the paid status and then delivery.
     @PostMapping("/{customerId}/checkOrderStatus/{orderId}")
     public OrderStatusResponse checkOrderStatus(@PathVariable Long customerId, @PathVariable Long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
@@ -186,7 +191,7 @@ public class StoreController {
         }
     }
 
-    // Method to get the store account ID
+    // Inner method to get the store account ID
     private Long getStoreAccountId() {
         // Check if a bank account with accountType 'store' exists
         Optional<Bank> storeAccountOpt = bankRepository.findByAccountType("store");
