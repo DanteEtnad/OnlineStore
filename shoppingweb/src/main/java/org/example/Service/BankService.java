@@ -36,7 +36,7 @@ public class BankService {
 
     // Timer, process a transfer task every 0.5 seconds
     @Transactional
-    @Scheduled(fixedDelay = 500) // Every 0.5 seconds
+//    @Scheduled(fixedDelay = 500) // Every 0.5 seconds
     public void processBankTransfers() {
         //Get all transfer requests with status 'PENDING'
         List<BankTransfer> pendingBankTransfers = bankTransferRepository.findByStatusIn(List.of("pending"));

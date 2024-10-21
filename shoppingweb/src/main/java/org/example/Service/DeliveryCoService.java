@@ -29,7 +29,7 @@ public class DeliveryCoService {
     private final Random random = new Random();
 
     @Transactional
-    @Scheduled(fixedDelay = 5000) // Every 5 seconds
+//    @Scheduled(fixedDelay = 5000) // Every 5 seconds
     public void processPaidOrders() {
         // Step 1: Find all orders with status 'payed' or those in transit
         List<Order> orders = orderRepository.findByStatusIn(List.of("payed", "packaged", "on the way", "delivered"));
