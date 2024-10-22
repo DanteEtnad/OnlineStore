@@ -4,7 +4,6 @@ import org.example.model.Bank;
 import org.example.model.BankTransfer;
 import org.example.repository.BankRepository;
 import org.example.repository.BankTransferRepository;
-import org.example.Service.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,15 +21,17 @@ public class BankController {
     @Autowired
     private BankTransferRepository bankTransferRepository;
 
+    @PostMapping("/createAccount")
+    public ResponseAccount<Bank> createAccount(@RequestParam String name,
+                                              @RequestParam String accountType,
+                                              @RequestParam Double balance) {
+        Bank newAccount = new Bank();
+        newAccount.setName(name);
+        newAccount.setAccountType(accountType);
+        newAccount.setBalance(balance);
+        bankRepository.save(newAccount);
 
-    @Autowired
-    private BankService bankService;
-
-    @PostMapping("/create")
-    public Bank createAccount(@RequestParam String name,
-                              @RequestParam String accountType,
-                              @RequestParam double initialBalance) {
-        return bankService.createBankAccount(name, accountType, initialBalance);
+        return new ResponseAccount<>("Account successfully created", newAccount);
     }
 
     //Get Balance by Id
@@ -112,6 +113,33 @@ public class BankController {
 
         public double getBalance() {
             return balance;
+        }
+    }
+
+    public class ResponseAccount<T> {
+        private String message;
+        private T data;
+
+        public ResponseAccount(String message, T data) {
+            this.message = message;
+            this.data = data;
+        }
+
+        // Getters and Setters
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public T getData() {
+            return data;
+        }
+
+        public void setData(T data) {
+            this.data = data;
         }
     }
 
