@@ -4,6 +4,7 @@ import org.example.model.Bank;
 import org.example.model.BankTransfer;
 import org.example.repository.BankRepository;
 import org.example.repository.BankTransferRepository;
+import org.example.Service.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,17 @@ public class BankController {
 
     @Autowired
     private BankTransferRepository bankTransferRepository;
+
+
+    @Autowired
+    private BankService bankService;
+
+    @PostMapping("/create")
+    public Bank createAccount(@RequestParam String name,
+                              @RequestParam String accountType,
+                              @RequestParam double initialBalance) {
+        return bankService.createBankAccount(name, accountType, initialBalance);
+    }
 
     //Get Balance by Id
     @GetMapping("/{accountId}/balance")
@@ -93,6 +105,14 @@ public class BankController {
             this.balance = balance;
         }
 
+        // Getters
+        public Long getAccountId() {
+            return accountId;
+        }
+
+        public double getBalance() {
+            return balance;
+        }
     }
 
     // Internal Classes for transfer info Get
@@ -108,6 +128,23 @@ public class BankController {
             this.toAccount = toAccount;
             this.status = status;
         }
+
+        // Getters
+        public Long getBankTransferId() {
+            return bankTransferId;
+        }
+
+        public Long getFromAccount() {
+            return fromAccount;
+        }
+
+        public Long getToAccount() {
+            return toAccount;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
 
     // Internal Classes for Responding to BankTransfer Status
@@ -119,6 +156,13 @@ public class BankController {
             this.bankTransferId = bankTransferId;
             this.status = status;
         }
+        // Getters
+        public Long getBankTransferId() {
+            return bankTransferId;
+        }
 
+        public String getStatus() {
+            return status;
+        }
     }
 }
