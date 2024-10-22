@@ -6,7 +6,6 @@ import org.example.model.BankTransfer;
 import org.example.repository.BankRepository;
 import org.example.repository.BankTransferRepository;
 import org.example.repository.OrderRepository;
-import org.example.controller.BankController;
 import org.example.controller.BankTransferController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,27 +28,7 @@ public class BankService {
     private OrderRepository orderRepository;
 
     @Autowired
-    private BankController bankController;
-
-    @Autowired
     private BankTransferController bankTransferController;
-
-    @Transactional
-    public void processBankTransfers() {
-        //Get all transfer requests with status 'PENDING'
-        List<BankTransfer> pendingBankTransfers = bankTransferRepository.findByStatusIn(List.of("pending"));
-
-        //Execute transfer operation
-        for (BankTransfer bankTransfer : pendingBankTransfers) {
-            Long bankTransferId = bankTransfer.getBankTransferId();
-
-            bankController.bankTransferAmount(bankTransferId);
-
-            System.out.println("Transfer " + bankTransfer.getStatus());
-
-            bankTransferRepository.save(bankTransfer);
-        }
-    }
 
     @Transactional
     public void createPaymentBill(Long fromAccountId, Long toAccountId) {
