@@ -15,10 +15,12 @@ import org.example.Service.StoreService;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -41,12 +43,21 @@ public class StoreController {
     @Autowired
     private BankTransferService bankTransferService;
 
-    private PasswordEncoder passwordEncoder;
-
     // Get all product information
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    //inner class for hash password
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Register a new user
@@ -57,7 +68,7 @@ public class StoreController {
         if (optionalCustomer.isPresent()) {
             Customer customer = optionalCustomer.get();
 
-            if (passwordEncoder.matches(password, customer.getPassword())) {
+            if (hashPassword(password).equals(customer.getPassword())) {
                 return new CustomerResponse<>("success", "Login successful", customer.getName());
             } else {
                 return new CustomerResponse<>("error", "Incorrect password", null);
@@ -74,7 +85,7 @@ public class StoreController {
             return new CustomerResponse<>("error", "Email is already registered", null);
         }
 
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPassword = hashPassword(password);
         Customer customer = new Customer();
         customer.setName(name);
         customer.setEmail(email);
