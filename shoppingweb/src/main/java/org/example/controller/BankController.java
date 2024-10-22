@@ -23,8 +23,8 @@ public class BankController {
 
     @PostMapping("/createAccount")
     public ResponseAccount<Bank> createAccount(@RequestParam String name,
-                                              @RequestParam String accountType,
-                                              @RequestParam Double balance) {
+                                               @RequestParam String accountType,
+                                               @RequestParam Double balance) {
         Bank newAccount = new Bank();
         newAccount.setName(name);
         newAccount.setAccountType(accountType);
