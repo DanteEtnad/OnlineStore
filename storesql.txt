@@ -39,6 +39,7 @@ CREATE TABLE Order (
     order_id SERIAL PRIMARY KEY,
     customer_id INT NOT NULL,         -- 外键，关联到客户表
     product_id INT NOT NULL,          -- 外键，关联到商品表
+    bank_transfer_id INT NOT NULL, -- 外键，关联到转账表
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 订单日期
     quantity INT NOT NULL,            -- 商品数量
     total_amount DECIMAL(10, 2) NOT NULL, -- 订单总金额
