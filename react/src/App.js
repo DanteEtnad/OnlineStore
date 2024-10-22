@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Home from './components/Homepage';
 import Login from './components/Login';
 import Register from './components/Register';
+import Store from './components/Store';
 // import ProductList from './components/ProductList'; // 引入产品列表页面
 // import ProductDetails from './components/ProductDetails'; // 引入产品详情页面
 // import ShoppingCart from './components/ShoppingCart'; // 引入购物车页面
@@ -19,6 +20,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} /> {/* 注册页面 */}
+              <Route path="/store" element={<Store />} />
             {/*<Route path="/products" element={<ProductList />} /> /!* 产品列表页面 *!/*/}
             {/*<Route path="/products/:id" element={<ProductDetails />} /> /!* 产品详情页面 *!/*/}
             {/*<Route path="/cart" element={<ShoppingCart />} /> /!* 购物车页面 *!/*/}

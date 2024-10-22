@@ -25,34 +25,23 @@ function Login() {
         // 发送登录请求
         StoreDataService.login(username, password)
             .then(response => {
-                const { status, message } = response.data;
-
-                // 如果后端返回错误状态
-                if (status === "error") {
-                    setErrorMessage(message || "Login failed, please try again.");
-                    setSubmitted(false);
+                if (response.data.status === 'error') {
+                    setErrorMessage(response.data.message);
                 } else {
                     console.log("Login successful:", response.data);
-
-                    // 设置提交状态并清除错误消息
                     setSubmitted(true);
                     setErrorMessage("");
 
                     // 显示成功模态框
                     setShowModal(true);
+                    // 登录成功后跳转到商品页面
+                    navigate('/store');
                 }
             })
             .catch(e => {
                 console.error("Login error:", e.response?.data || e.message);
-                setErrorMessage(e.response?.data?.message || "Login failed, please try again later.");
-                setSubmitted(false); // 确保在失败的情况下，`submitted` 不会是 true
+                setErrorMessage(e.response?.data || "Login failed, please try again later.");
             });
-    };
-
-    // 关闭模态框并重定向到主页或其他页面
-    const handleModalClose = () => {
-        setShowModal(false);
-        navigate('/'); // 跳转到主页
     };
 
     return (
@@ -103,21 +92,6 @@ function Login() {
                         </Button>
                     </Form>
                 )}
-
-                {/* 模态框显示登录成功 */}
-                <Modal show={showModal} onHide={handleModalClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Login Successful</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        Welcome back, {username}!
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="primary" onClick={handleModalClose}>
-                            OK
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
             </div>
         </div>
     );
