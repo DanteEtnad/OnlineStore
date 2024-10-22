@@ -35,17 +35,6 @@ public class BankService {
     private BankTransferController bankTransferController;
 
     @Transactional
-    public Bank createBankAccount(String name, String accountType, double initialBalance) {
-        Bank bankAccount = new Bank();
-        bankAccount.setName(name);
-        bankAccount.setAccountType(accountType);
-        bankAccount.setBalance(initialBalance);
-
-        // Save the bank account to the database
-        return bankRepository.save(bankAccount);
-    }
-
-    @Transactional
     public void processBankTransfers() {
         //Get all transfer requests with status 'PENDING'
         List<BankTransfer> pendingBankTransfers = bankTransferRepository.findByStatusIn(List.of("pending"));
