@@ -12,27 +12,27 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "customerId")
-    private Customer customer;
+    private Customer customer;  // 客户对象
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "productId")
-    private Product product;
+    private Product product;  // 产品对象
 
     @ManyToOne
     @JoinColumn(name = "bank_transfer_id", referencedColumnName = "bankTransferId")
-    private BankTransfer bankTransfer;
+    private BankTransfer bankTransfer;  // 银行转账对象
 
     @Column(nullable = false)
-    private LocalDateTime orderDate;
+    private LocalDateTime orderDate;  // 订单日期
 
     @Column(nullable = false)
-    private Integer quantity;
+    private Integer quantity;  // 订单数量
 
     @Column(nullable = false)
-    private Double totalAmount;
+    private Double totalAmount;  // 订单总金额
 
     @Column(nullable = false)
-    private String status = "pending";
+    private String status = "pending";  // 订单状态
 
     // Getter for orderId
     public Long getOrderId() {
@@ -54,22 +54,53 @@ public class Order {
         return customer;
     }
 
-    // Getter for totalamount
-    public Double getTotalAmount() {return totalAmount;}
+    // Getter for totalAmount
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
 
-    public BankTransfer getBankTransfer() {return bankTransfer;}
+    // Getter for bankTransfer
+    public BankTransfer getBankTransfer() {
+        return bankTransfer;
+    }
 
-    // Setter
+    // Getter for orderDate
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    // Setter for status
     public void setStatus(String status) {
         this.status = status;
     }
 
-    public void setProduct(Product product) {this.product = product;}
+    // Setter for product
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
-    public void setQuantity(Integer quantity) {this.quantity = quantity;}
+    // Setter for quantity
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 
-    public void setTotalAmount(Double totalAmount) {this.totalAmount = totalAmount;}
+    // Setter for totalAmount
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 
-    public void setBankTransfer(BankTransfer bankTransfer) {this.bankTransfer = bankTransfer;}
+    // Setter for bankTransfer
+    public void setBankTransfer(BankTransfer bankTransfer) {
+        this.bankTransfer = bankTransfer;
+    }
 
+    // Setter for orderDate
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    // Setter for customer
+    public void setCustomer(Customer customer) { // 添加 setCustomer 方法
+        this.customer = customer;
+    }
 }

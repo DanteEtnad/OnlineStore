@@ -1,0 +1,29 @@
+.payment-container {
+    max-width: 600px; /* 设置最大宽度 */
+    margin: 0 auto; /* 居中对齐 */
+}
+
+.payment-container h2 {
+    text-align: center; /* 标题居中 */
+    margin-bottom: 20px; /* 标题底部间距 */
+    font-size: 1.5rem; /* 调整标题字体大小 */
+}
+
+.mb-3 {
+    margin-bottom: 1rem; /* 为每个字段添加底部间距 */
+}
+
+.form-label {
+    font-weight: bold; /* 标签加粗 */
+    font-size: 1.1rem; /* 标签字体大小 */
+}
+
+.form-text {
+    display: block; /* 确保文本占据一整行 */
+    margin-top: 0.25rem; /* 标签与文本之间的间距 */
+    font-size: 1rem; /* 字体大小 */
+}
+
+button {
+    font-size: 1rem; /* 按钮字体大小 */
+}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Button, Alert, Modal } from 'react-bootstrap';
+import { Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import StoreDataService from "../services/store.service"; // 导入用户服务用于API请求
+import { useAuth } from '../context/AuthContext'; // 使用 useAuth 代替 AuthContext
 import './Login.css'; // 导入样式
 
 function Login() {
@@ -9,7 +10,7 @@ function Login() {
     const [password, setPassword] = useState(''); // 存储密码
     const [errorMessage, setErrorMessage] = useState(''); // 错误消息
     const [submitted, setSubmitted] = useState(false); // 跟踪表单是否提交成功
-    const [showModal, setShowModal] = useState(false); // 控制模态框的显示
+    const { login } = useAuth(); // 从 useAuth 中获取 login 函数
     const navigate = useNavigate(); // 用于页面重定向
 
     // 处理表单提交
@@ -32,9 +33,8 @@ function Login() {
                     setSubmitted(true);
                     setErrorMessage("");
 
-                    // 显示成功模态框
-                    setShowModal(true);
-                    // 登录成功后跳转到商品页面
+                    // 确保将完整的用户数据（例如 customerId）保存到 AuthContext
+                    login(response.data.data); // 这里的 data 现在包含 customerId 和 name
                     navigate('/store');
                 }
             })
@@ -42,6 +42,7 @@ function Login() {
                 console.error("Login error:", e.response?.data || e.message);
                 setErrorMessage(e.response?.data || "Login failed, please try again later.");
             });
+
     };
 
     return (

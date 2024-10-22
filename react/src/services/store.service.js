@@ -35,16 +35,17 @@ class StoreDataService {
         params.append('productId', productId);
         params.append('quantity', quantity);
 
-        return http.post(`/store/${customerId}/order?` + params.toString());
+        // 确保使用反引号``进行字符串拼接
+        return http.post(`/store/${customerId}/order?${params.toString()}`);
     }
 
-    // 创建支付发票
+// 创建支付发票
     createPayment(customerId, orderId, fromAccountId) {
-        // 将支付信息通过 URL 查询参数发送
         const params = new URLSearchParams();
         params.append('fromAccountId', fromAccountId);
 
-        return http.post(`/store/${customerId}/${orderId}/payment?` + params.toString());
+        // 同样确保使用反引号``进行拼接
+        return http.post(`/store/${customerId}/${orderId}/payment?${params.toString()}`);
     }
 
     // 处理退款

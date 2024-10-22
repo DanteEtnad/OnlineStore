@@ -11,17 +11,17 @@ import org.example.repository.OrderRepository;
 import org.example.repository.BankRepository;
 import org.example.Service.BankService;
 import org.example.Service.BankTransferService;
-import org.example.Service.StoreService;
-import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -49,7 +49,7 @@ public class StoreController {
         return productRepository.findAll();
     }
 
-    //inner class for hash password
+    // Inner class for hash password
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -60,7 +60,7 @@ public class StoreController {
         }
     }
 
-    // Register a new user
+    // Log in
     @PostMapping("/login")
     public CustomerResponse<Object> login(@RequestParam String name, @RequestParam String password) {
         Optional<Customer> optionalCustomer = customerRepository.findByName(name);
@@ -69,7 +69,11 @@ public class StoreController {
             Customer customer = optionalCustomer.get();
 
             if (hashPassword(password).equals(customer.getPassword())) {
-                return new CustomerResponse<>("success", "Login successful", customer.getName());
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("customerId", customer.getCustomerId());
+                userInfo.put("name", customer.getName());
+
+                return new CustomerResponse<>("success", "Login successful", userInfo);
             } else {
                 return new CustomerResponse<>("error", "Incorrect password", null);
             }
@@ -78,7 +82,7 @@ public class StoreController {
         }
     }
 
-    // Log in
+    // Register
     @PostMapping("/register")
     @ResponseBody
     public CustomerResponse<Object> register(@RequestParam String name, @RequestParam String email, @RequestParam String password) {
@@ -100,15 +104,15 @@ public class StoreController {
         return new CustomerResponse<>("success", "Registration successful", customer.getCustomerId());
     }
 
-    // Order function
     @PostMapping("/{customerId}/order")
     public CustomerResponse<Object> placeOrder(@PathVariable Long customerId, @RequestParam Long productId, @RequestParam Integer quantity) {
         // Step 1: Find Products
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Optional<Customer> customer = customerRepository.findById(customerId);
 
-        if (optionalProduct.isPresent()) {
+        if (optionalProduct.isPresent() && customer.isPresent()) {
             Product product = optionalProduct.get();
+            Customer foundCustomer = customer.get();
 
             // Step 2: Calculate the total price
             Double totalAmount = product.getPrice() * quantity;
@@ -118,15 +122,19 @@ public class StoreController {
             order.setProduct(product);
             order.setQuantity(quantity);
             order.setTotalAmount(totalAmount);
+            order.setOrderDate(LocalDateTime.now()); // 设置订单日期为当前时间
+            order.setCustomer(foundCustomer); // 设置客户信息
+
             orderRepository.save(order);
 
             // Step 4: Return order information
             return new CustomerResponse<>("success", "Order placed successfully",
-                    new OrderResponse(customer.get().getCustomerId(), order.getOrderId(), product.getProductId(), quantity, totalAmount));
+                    new OrderResponse(foundCustomer.getCustomerId(), order.getOrderId(), product.getProductId(), product.getProductName(), quantity, product.getPrice(), totalAmount)); // 确保传递产品名称
         } else {
-            return new CustomerResponse<>("error", "Product not found", null);
+            return new CustomerResponse<>("error", "Product or customer not found", null);
         }
     }
+
 
     // Create a payment invoice
     @PostMapping("/{customerId}/{orderId}/payment")
@@ -153,7 +161,7 @@ public class StoreController {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
-            if(!order.getBankTransfer().getStatus().equals("success")){
+            if (!order.getBankTransfer().getStatus().equals("success")) {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
@@ -175,7 +183,7 @@ public class StoreController {
         }
     }
 
-    //Only by calling this function can the order status be changed to paid, and then the deliveryCo will detect the paid status and then delivery.
+    // Only by calling this function can the order status be changed to paid, and then the deliveryCo will detect the paid status and then delivery.
     @PostMapping("/{customerId}/checkOrderStatus/{orderId}")
     public OrderStatusResponse checkOrderStatus(@PathVariable Long customerId, @PathVariable Long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
@@ -230,8 +238,7 @@ public class StoreController {
         }
     }
 
-
-    //Inner Class for response
+    // Inner Class for response
     public static class CustomerResponse<T> {
         private String status;
         private String message;
@@ -256,20 +263,23 @@ public class StoreController {
         }
     }
 
-
     // Inner class used to return order information
     public static class OrderResponse {
         private Long customerId;
         private Long orderId;
         private Long productId;
+        private String productName; // 添加产品名称
         private Integer quantity;
+        private Double unitPrice; // 单价
         private Double totalAmount;
 
-        public OrderResponse(Long customerId, Long orderId, Long productId, Integer quantity, Double totalAmount) {
+        public OrderResponse(Long customerId, Long orderId, Long productId, String productName, Integer quantity, Double unitPrice, Double totalAmount) {
             this.customerId = customerId;
             this.orderId = orderId;
             this.productId = productId;
+            this.productName = productName; // 赋值产品名称
             this.quantity = quantity;
+            this.unitPrice = unitPrice; // 赋值单价
             this.totalAmount = totalAmount;
         }
 
@@ -285,15 +295,22 @@ public class StoreController {
             return productId;
         }
 
+        public String getProductName() {
+            return productName; // 返回产品名称
+        }
+
         public Integer getQuantity() {
             return quantity;
+        }
+
+        public Double getUnitPrice() {
+            return unitPrice; // 返回单价
         }
 
         public Double getTotalAmount() {
             return totalAmount;
         }
     }
-
 
     // Inner class for refund response
     public static class RefundResponse {
@@ -347,5 +364,4 @@ public class StoreController {
             return status;
         }
     }
-
 }
