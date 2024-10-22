@@ -80,9 +80,14 @@ public class StoreController {
 
     // Log in
     @PostMapping("/register")
+    @ResponseBody
     public CustomerResponse<Object> register(@RequestParam String name, @RequestParam String email, @RequestParam String password) {
         if (customerRepository.findByEmail(email).isPresent()) {
             return new CustomerResponse<>("error", "Email is already registered", null);
+        }
+
+        if (customerRepository.findByName(name).isPresent()) {
+            return new CustomerResponse<>("error", "Username is already registered", null);
         }
 
         String encodedPassword = hashPassword(password);
@@ -237,7 +242,20 @@ public class StoreController {
             this.message = message;
             this.data = data;
         }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public T getData() {
+            return data;
+        }
     }
+
 
     // Inner class used to return order information
     public static class OrderResponse {
@@ -254,7 +272,28 @@ public class StoreController {
             this.quantity = quantity;
             this.totalAmount = totalAmount;
         }
+
+        public Long getCustomerId() {
+            return customerId;
+        }
+
+        public Long getOrderId() {
+            return orderId;
+        }
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
+        public Double getTotalAmount() {
+            return totalAmount;
+        }
     }
+
 
     // Inner class for refund response
     public static class RefundResponse {
@@ -272,9 +311,21 @@ public class StoreController {
             this.refundTransferId = refundTransferId;
             this.message = message;
         }
+
+        public Long getOrderId() {
+            return orderId;
+        }
+
+        public Long getRefundTransferId() {
+            return refundTransferId;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 
-    //Inner Class for order status response
+    // Inner Class for order status response
     public static class OrderStatusResponse {
         private String message;
         private String status;
@@ -283,8 +334,18 @@ public class StoreController {
             this.message = message;
             this.status = status;
         }
+
         public OrderStatusResponse(String message) {
             this.message = message;
         }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
+
 }
