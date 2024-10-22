@@ -41,6 +41,8 @@ public class OrderController {
             this.orderId = orderId;
             this.status = status;
         }
-
+        //Getter
+        public Long getOrderId() {return orderId;}
+        public String getStatus() {return status;}
     }
 }
