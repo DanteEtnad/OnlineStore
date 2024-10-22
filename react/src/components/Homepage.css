@@ -1,0 +1,60 @@
+.home-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 30px;
+}
+
+.home-content {
+    max-width: 900px; /* 调整宽度让页面更大气 */
+    background-color: #f9f9f9;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.home-button {
+    width: 180px;
+    height: 50px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.login-button {
+    background-color: #007bff; /* 蓝色 */
+    border: none;
+    color: white; /* 确保文字是白色 */
+}
+
+.register-button {
+    background-color: #28a745; /* 绿色 */
+    border: none;
+    color: white; /* 确保文字是白色 */
+}
+
+
+.explore-button {
+    background-color: #17a2b8; /* 其他颜色 */
+    border: none;
+    width: 200px; /* 确保宽度与其他按钮一致 */
+    height: 60px; /* 确保高度与其他按钮一致 */
+    font-size: 1.2em; /* 确保字体大小与其他按钮一致 */
+    font-weight: bold; /* 确保字体加粗 */
+    border-radius: 5px; /* 确保边角一致 */
+    color: white; /* 确保文字是白色 */
+}
+
+
+.features-section {
+    margin-top: 40px;
+}
+
+.feature-card {
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+

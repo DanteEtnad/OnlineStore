@@ -1,45 +1,34 @@
-import React, { Component } from "react";
-import { Link, Route, Routes } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Home from './components/Homepage';
+import Login from './components/Login';
+import Register from './components/Register';
+// import ProductList from './components/ProductList'; // 引入产品列表页面
+// import ProductDetails from './components/ProductDetails'; // 引入产品详情页面
+// import ShoppingCart from './components/ShoppingCart'; // 引入购物车页面
+// import OrderHistory from './components/OrderHistory'; // 引入订单历史页面
+// import Profile from './components/Profile'; // 引入个人信息页面
+// import Checkout from './components/Checkout'; // 引入结账页面
 
-import EmployeesList from "./components/employees-list.component";
-import Employee from "./components/employee.component";
-import AddEmployee from "./components/add-employee.component";
-
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <nav className="navbar navbar-expand navbar-dark bg-dark">
-          <a href="/employees" className="navbar-brand">
-            Payroll
-          </a>
-          <div className="navbar-nav mr-auto">
-            <li className="nav-item">
-              <Link to={"/employees"} className="nav-link">
-                Employees
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to={"/add"} className="nav-link">
-                Add Employee
-              </Link>
-            </li>
-          </div>
-        </nav>
-
-        <div className="container mt-3">
+function App() {
+  return (
+      <AuthProvider>
+        <div className="App">
           <Routes>
-            <Route path="/" element={<EmployeesList />} />
-            <Route path="/employees" element={<EmployeesList />} />
-            <Route path="/add" element={<AddEmployee />} />
-            <Route path="/employees/:id" element={<Employee />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} /> {/* 注册页面 */}
+            {/*<Route path="/products" element={<ProductList />} /> /!* 产品列表页面 *!/*/}
+            {/*<Route path="/products/:id" element={<ProductDetails />} /> /!* 产品详情页面 *!/*/}
+            {/*<Route path="/cart" element={<ShoppingCart />} /> /!* 购物车页面 *!/*/}
+            {/*<Route path="/checkout" element={<Checkout />} /> /!* 结账页面 *!/*/}
+            {/*<Route path="/orders" element={<OrderHistory />} /> /!* 订单历史页面 *!/*/}
+            {/*<Route path="/profile" element={<Profile />} /> /!* 个人信息页面 *!/*/}
           </Routes>
         </div>
-      </div>
-    );
-  }
+      </AuthProvider>
+  );
 }
 
 export default App;
