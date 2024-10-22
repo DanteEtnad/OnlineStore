@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import StoreDataService from "../services/store.service"; // 导入用户服务用于API请求
+import StoreDataService from "../services/store.service"; // 导入API请求服务
 import './Register.css'; // 导入样式
 
 function Register() {
@@ -10,8 +10,8 @@ function Register() {
     const [password, setPassword] = useState(''); // 存储密码
     const [errorMessage, setErrorMessage] = useState(''); // 错误消息
     const [submitted, setSubmitted] = useState(false); // 跟踪表单是否提交成功
-    const [showModal, setShowModal] = useState(false); // 控制模态框的显示
-    const navigate = useNavigate(); // 用于页面重定向
+    const [showModal, setShowModal] = useState(false); // 控制模态框显示
+    const navigate = useNavigate(); // 用于页面跳转
 
     // 处理表单提交
     const handleRegister = (e) => {
@@ -25,28 +25,40 @@ function Register() {
 
         // 构造用户数据
         const userData = {
-            name: username,  // 注意这里应该传递 'name' 而不是 'username'
+            name: username,
             email,
             password,
         };
 
         // 发送注册请求
-        StoreDataService.register(userData.name, userData.email, userData.password) // 确保正确传递参数
+        StoreDataService.register(userData.name, userData.email, userData.password)
             .then(response => {
-                console.log("Registration successful:", response.data);
-                setSubmitted(true);
-                setErrorMessage("");
+                const { status, message } = response.data;
 
-                // 显示成功模态框
-                setShowModal(true);
+                if (status === "success") {
+                    console.log("Registration successful:", response.data);
+                    setSubmitted(true);
+                    setErrorMessage(""); // 清空错误消息
+
+                    // 显示成功模态框
+                    setShowModal(true);
+                } else {
+                    // 如果返回的是错误信息，则显示错误信息
+                    setErrorMessage(message || "Registration failed, please try again later.");
+                    setSubmitted(false); // 确保不会显示注册成功
+                }
             })
             .catch(e => {
+                // 处理注册错误，确保仅显示可读的错误消息
+                const errorResponse = e.response?.data;
+                const errorMsg = typeof errorResponse === 'string' ? errorResponse : "Registration failed, please try again later.";
+                setErrorMessage(errorMsg);
+                setSubmitted(false); // 确保不会显示注册成功
                 console.error("Registration error:", e.response?.data || e.message);
-                setErrorMessage(e.response?.data || "Registration failed, please try again later.");
             });
     };
 
-    // 关闭模态框并重定向到登录页面
+    // 关闭模态框并跳转到登录页面
     const handleModalClose = () => {
         setShowModal(false);
         navigate('/login'); // 跳转到登录页面

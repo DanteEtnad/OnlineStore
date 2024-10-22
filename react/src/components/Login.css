@@ -1,0 +1,86 @@
+/* Wrapper to center the form on the page */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background for a calm visual */
+}
+
+/* Container for the login form */
+.login-form-container {
+    width: 100%;
+    max-width: 400px; /* Set a max-width for the form container */
+    padding: 30px;
+    border-radius: 8px; /* Rounded corners */
+    background-color: #ffffff; /* White background for the form */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+}
+
+/* Title styling */
+.login-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Form styling */
+.login-form {
+    margin-bottom: 15px;
+}
+
+/* Login button styling */
+.login-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2rem; /* Slightly larger font for the button */
+    font-weight: bold;
+    background-color: #007bff; /* Primary blue color */
+    border: none;
+    border-radius: 5px; /* Rounded corners for the button */
+    transition: background-color 0.3s ease; /* Smooth transition for hover */
+}
+
+/* Button hover effect */
+.login-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    border-color: #0056b3;
+}
+
+/* Error message styling */
+.login-alert {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+/* Spacing between form groups */
+.login-form .form-group {
+    margin-bottom: 20px;
+}
+
+/* Style for invalid input fields */
+.is-invalid {
+    border-color: #dc3545; /* Red border for invalid inputs */
+}
+
+/* Modal styling */
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+/* Responsive design for smaller devices */
+@media (max-width: 768px) {
+    .login-form-container {
+        padding: 20px; /* Reduce padding for smaller screens */
+    }
+
+    .login-button {
+        font-size: 1rem; /* Adjust button size for smaller screens */
+    }
+}
