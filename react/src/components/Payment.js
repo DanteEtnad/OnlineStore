@@ -7,8 +7,8 @@ import './Payment.css';
 function Payment() {
     const location = useLocation();
     const { orderId, productId, quantity, productName, customerId } = location.state || {}; // 从路由状态中获取订单信息
-    const [accountId, setAccountId] = useState('');
-    const [paymentStatus, setPaymentStatus] = useState('');
+    const [accountId, setAccountId] = useState(''); // 用户输入的账户ID
+    const [paymentStatus, setPaymentStatus] = useState(''); // 支付状态信息
     const [showPostPaymentOptions, setShowPostPaymentOptions] = useState(false); // 控制退款和配送选项的显示
 
     // 处理支付
@@ -18,7 +18,8 @@ function Payment() {
             return;
         }
 
-        StoreDataService.createPayment(orderId, accountId) // 确保传递正确的参数
+        // 调用服务方法发起支付请求
+        StoreDataService.createPayment(customerId, orderId, accountId) // 确保传递正确的参数
             .then(response => {
                 if (response.data.status === 'success') {
                     setPaymentStatus('Payment successful!');
