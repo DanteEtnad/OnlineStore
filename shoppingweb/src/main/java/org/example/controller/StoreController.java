@@ -163,7 +163,7 @@ public class StoreController {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
-            if (!order.getBankTransfer().getStatus().equals("success")) {
+            if (!order.getBankTransfer().getStatus().equals("completed")) {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
