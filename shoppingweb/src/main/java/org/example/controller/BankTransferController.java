@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import org.example.model.BankTransfer;
-import org.example.Service.BankTransferService;
+import org.example.repository.BankTransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 public class BankTransferController {
 
     @Autowired
-    private BankTransferService bankTransferService;
+    private BankTransferRepository bankTransferRepository;
 
     // Endpoint to create a new bank transfer
-    @PostMapping("/create")
-    public BankTransfer createBankTransfer(
-            @RequestParam Long fromAccount,
-            @RequestParam Long toAccount,
-            @RequestParam Double amount) {
-        return bankTransferService.createBankTransfer(fromAccount, toAccount, amount);
+    public BankTransfer createBankTransfer(Long fromAccount, Long toAccount, Double amount) {
+        BankTransfer bankTransfer = new BankTransfer();
+        bankTransfer.setFromAccount(fromAccount);
+        bankTransfer.setToAccount(toAccount);
+        bankTransfer.setAmount(amount);
+        return bankTransferRepository.save(bankTransfer);
     }
 }

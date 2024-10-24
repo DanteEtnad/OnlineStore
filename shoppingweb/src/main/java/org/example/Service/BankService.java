@@ -31,7 +31,7 @@ public class BankService {
     private BankTransferController bankTransferController;
 
     @Transactional
-    public void createPaymentBill(Long fromAccountId, Long toAccountId) {
+    public void createPaymentBill(Long fromAccountId, Long toAccountId, Long orderId) {
         // Step 1: Validate fromAccount
         Bank fromAccount = bankRepository.findById(fromAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("From account not found"));
@@ -45,18 +45,22 @@ public class BankService {
             throw new IllegalArgumentException("To account must be a store account");
         }
 
-        // Step 3: Retrieve all pending orders
-        List<Order> pendingOrders = orderRepository.findByStatusIn(List.of("pending"));
+        // Step 3: Retrieve the specific order by orderId
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        for (Order order : pendingOrders) {
-            // Step 4: Create payment bill
-            BankTransfer bankTransfer = bankTransferController.createBankTransfer(fromAccountId, toAccountId, order.getTotalAmount());
-            bankTransferRepository.save(bankTransfer);
-
-            // Step 5: Update order status to "payment in progress"
-            order.setStatus("paying");
-            orderRepository.save(order);
+        // Check if the order status is "pending"
+        if (!"pending".equals(order.getStatus())) {
+            throw new IllegalArgumentException("Order status must be 'pending'");
         }
+
+        // Step 4: Create payment bill
+        BankTransfer bankTransfer = bankTransferController.createBankTransfer(fromAccountId, toAccountId, order.getTotalAmount());
+        bankTransferRepository.save(bankTransfer);
+
+        // Step 5: Update order status to "payment in progress"
+        order.setStatus("paying");
+        orderRepository.save(order);
     }
 
     @Transactional

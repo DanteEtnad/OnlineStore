@@ -144,7 +144,7 @@ public class StoreController {
     public CustomerResponse<Object> createPayment(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         try {
             Long toAccountId = this.getStoreAccountId();
-            bankService.createPaymentBill(fromAccountId, toAccountId);
+            bankService.createPaymentBill(fromAccountId, toAccountId, orderId);
             return new CustomerResponse<>("success", "Payment bills created successfully", null);
         } catch (Exception e) {
             return new CustomerResponse<>("error", e.getMessage(), null);
