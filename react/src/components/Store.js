@@ -49,6 +49,7 @@ function Store() {
             .then(response => {
                 if (response.data.status === 'success') {
                     const { orderId, productName, totalAmount } = response.data.data; // 解构获取订单信息
+                    const selectedProduct = products.find(product => product.productId === productId);
 
                     // Check if totalAmount is defined
                     if (totalAmount !== undefined) {
@@ -60,6 +61,7 @@ function Store() {
                             quantity, // 数量
                             totalAmount, // 总金额
                             customerId: user.customerId, // 客户 ID
+                            price: selectedProduct.price,
                         });
                         setShowModal(true); // 显示弹窗
                     } else {
@@ -114,7 +116,9 @@ function Store() {
                     <p><strong>Product Name:</strong> {orderDetails.productName}</p>
                     <p><strong>Product ID:</strong> {orderDetails.productId}</p>
                     <p><strong>Quantity:</strong> {orderDetails.quantity}</p>
-                    <p><strong>Total Amount:</strong> ${orderDetails.totalAmount ? orderDetails.totalAmount.toFixed(2) : 'N/A'}</p>
+                    <p><strong>Price:</strong> {orderDetails.price}</p>
+                    <p><strong>Total
+                        Amount:</strong> ${orderDetails.totalAmount ? orderDetails.totalAmount.toFixed(2) : 'N/A'}</p>
                     <p><strong>Customer ID:</strong> {orderDetails.customerId}</p>
                 </Modal.Body>
                 <Modal.Footer>

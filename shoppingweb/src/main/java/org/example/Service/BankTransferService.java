@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BankTransferService {
@@ -66,5 +67,9 @@ public class BankTransferService {
                 bankTransferRepository.save(transfer);
             }
         }
+    }
+
+    public Optional<BankTransfer> findById(Long bankTransferId) {
+        return bankTransferRepository.findById(bankTransferId);
     }
 }

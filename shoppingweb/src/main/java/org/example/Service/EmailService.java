@@ -22,7 +22,7 @@ public class EmailService {
     private final Map<Long, String> orderStatusMap = new HashMap<>();
     private final List<Notification> notifications = new ArrayList<>();
 
-//    @Scheduled(fixedDelay = 500) // Every 0.5 seconds
+    @Scheduled(fixedDelay = 500) // Every 0.5 seconds
     public void checkOrderStatus() {
         List<Order> orders = orderRepository.findAll();
 

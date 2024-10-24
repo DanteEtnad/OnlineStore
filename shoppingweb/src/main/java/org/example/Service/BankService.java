@@ -8,12 +8,8 @@ import org.example.repository.BankTransferRepository;
 import org.example.repository.OrderRepository;
 import org.example.controller.BankTransferController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Random;
 
 @Service
 public class BankService {
@@ -31,7 +27,7 @@ public class BankService {
     private BankTransferController bankTransferController;
 
     @Transactional
-    public void createPaymentBill(Long fromAccountId, Long toAccountId, Long orderId) {
+    public BankTransfer createPaymentBill(Long fromAccountId, Long toAccountId, Long orderId) {
         // Step 1: Validate fromAccount
         Bank fromAccount = bankRepository.findById(fromAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("From account not found"));
@@ -62,6 +58,7 @@ public class BankService {
         order.setStatus("paying");
         order.setBankTransfer(bankTransfer);
         orderRepository.save(order);
+        return bankTransfer;
     }
 
     @Transactional

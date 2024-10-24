@@ -12,6 +12,9 @@ import org.example.repository.OrderRepository;
 import org.example.repository.BankRepository;
 import org.example.Service.BankTransferService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Async;
+import jakarta.persistence.EntityManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -45,6 +48,9 @@ public class StoreController {
 
     @Autowired
     private BankTransferService bankTransferService;
+
+    @Autowired
+    private EntityManager entityManager;
 
     // Get all product information
     @GetMapping("/products")
@@ -139,28 +145,33 @@ public class StoreController {
     }
 
 
-    // Create a payment invoice and check the payment status
+
     @PostMapping("/{customerId}/{orderId}/payment")
     public CustomerResponse<Object> createPayment(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         try {
-            Long toAccountId = this.getStoreAccountId();
-            bankService.createPaymentBill(fromAccountId, toAccountId, orderId);
+            Long toAccountId = this.getStoreAccountId();  // 获取店铺账户ID
+            BankTransfer bankTransfer = bankService.createPaymentBill(fromAccountId, toAccountId, orderId);
 
-            Thread.sleep(5000);
-
-            BankTransfer bill = orderRepository.findById(orderId).get().getBankTransfer();
-            if (bill.getStatus().equals("completed")) {
-                return new CustomerResponse<>("success", "Payment bills paid successfully", null);
-            }else if (bill.getStatus().equals("pedding")) {
-                return new CustomerResponse<>("pedding", "Payment bills pedding", null);
-            }else{
-                return new CustomerResponse<>("fail", "Payment bills paid fail", null);
-            }
-
+            // 返回 bankTransferId 以便前端可以查询状态
+            return new CustomerResponse<>("success", "Payment initiated", bankTransfer.getBankTransferId());
         } catch (Exception e) {
             return new CustomerResponse<>("error", e.getMessage(), null);
         }
     }
+
+    @GetMapping("/paymentStatus/{bankTransferId}")
+    public CustomerResponse<String> getPaymentStatus(@PathVariable Long bankTransferId) {
+        Optional<BankTransfer> optionalTransfer = bankTransferService.findById(bankTransferId);
+        if (optionalTransfer.isPresent()) {
+            BankTransfer bankTransfer = optionalTransfer.get();
+            return new CustomerResponse<>("success", "Payment status retrieved", bankTransfer.getStatus());
+        } else {
+            return new CustomerResponse<>("error", "BankTransfer not found", null);
+        }
+    }
+
+
+
 
     @PostMapping("/{customerId}/{orderId}/refund")
     public RefundResponse refundOrder(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
@@ -178,7 +189,7 @@ public class StoreController {
             String orderStatus = orderbankTransfer.getStatus();
 
             if (!orderStatus.equals("completed")) {
-                return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
+                return new RefundResponse(orderId, "Refund not possible. The order is not paid2.");
             }
 
             // Get the store's account
@@ -214,11 +225,11 @@ public class StoreController {
 
                 if (bankTransfer != null) {
                     // Check the status of the BankTransfer
-                    if (bankTransfer.getStatus().equals("success")) {
+                    if (bankTransfer.getStatus().equals("completed")) {
                         // Update the order status to 'paid'
                         order.setStatus("paid");
                         orderRepository.save(order);
-                        return new OrderStatusResponse("Order status updated to 'paid' for order ID: " + orderId);
+                        return new OrderStatusResponse("Order status updated to 'paid' for order ID: " + orderId, "order changed to paid");
                     } else {
                         return new OrderStatusResponse("Bank transfer status is not successful. Current status: ", bankTransfer.getStatus());
                     }

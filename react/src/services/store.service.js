@@ -48,6 +48,11 @@ class StoreDataService {
         return http.post(`/store/${customerId}/${orderId}/payment?${params.toString()}`);
     }
 
+    getPaymentStatus(bankTransferId) {
+        // 通过 GET 请求查询支付状态
+        return http.get(`/store/paymentStatus/${bankTransferId}`);
+    }
+
     // 处理退款
     refundOrder(customerId, orderId, fromAccountId) {
         // 将退款信息通过 URL 查询参数发送
@@ -63,5 +68,6 @@ class StoreDataService {
         return http.post(`/store/${customerId}/checkOrderStatus/${orderId}`);
     }
 }
+
 
 export default new StoreDataService();
