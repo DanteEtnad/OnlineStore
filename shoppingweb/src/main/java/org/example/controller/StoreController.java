@@ -139,13 +139,24 @@ public class StoreController {
     }
 
 
-    // Create a payment invoice
+    // Create a payment invoice and check the payment status
     @PostMapping("/{customerId}/{orderId}/payment")
     public CustomerResponse<Object> createPayment(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         try {
             Long toAccountId = this.getStoreAccountId();
             bankService.createPaymentBill(fromAccountId, toAccountId, orderId);
-            return new CustomerResponse<>("success", "Payment bills created successfully", null);
+
+            Thread.sleep(5000);
+
+            BankTransfer bill = orderRepository.findById(orderId).get().getBankTransfer();
+            if (bill.getStatus().equals("completed")) {
+                return new CustomerResponse<>("success", "Payment bills paid successfully", null);
+            }else if (bill.getStatus().equals("pedding")) {
+                return new CustomerResponse<>("pedding", "Payment bills pedding", null);
+            }else{
+                return new CustomerResponse<>("fail", "Payment bills paid fail", null);
+            }
+
         } catch (Exception e) {
             return new CustomerResponse<>("error", e.getMessage(), null);
         }
