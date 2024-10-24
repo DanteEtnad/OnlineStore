@@ -159,7 +159,7 @@ public class StoreController {
             Order order = optionalOrder.get();
 
             // Check if the order is eligible for a refund (paid)
-            if (!order.getStatus().equals("paying") || !order.getStatus().equals("payed")) {
+            if (!order.getStatus().equals("paying") && !order.getStatus().equals("payed")) {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
