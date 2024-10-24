@@ -5,11 +5,11 @@ import org.example.model.Customer;
 import org.example.model.Order;
 import org.example.model.Bank;
 import org.example.model.BankTransfer;
+import org.example.Service.BankService;
 import org.example.repository.ProductRepository;
 import org.example.repository.CustomerRepository;
 import org.example.repository.OrderRepository;
 import org.example.repository.BankRepository;
-import org.example.Service.BankService;
 import org.example.Service.BankTransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +39,9 @@ public class StoreController {
 
     @Autowired
     private BankRepository bankRepository;
+
+    @Autowired
+    private BankService bankService;
 
     @Autowired
     private BankTransferService bankTransferService;
@@ -139,7 +142,6 @@ public class StoreController {
     // Create a payment invoice
     @PostMapping("/{customerId}/{orderId}/payment")
     public CustomerResponse<Object> createPayment(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
-        BankService bankService = new BankService();
         try {
             Long toAccountId = this.getStoreAccountId();
             bankService.createPaymentBill(fromAccountId, toAccountId);
