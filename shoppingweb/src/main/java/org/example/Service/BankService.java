@@ -60,6 +60,7 @@ public class BankService {
 
         // Step 5: Update order status to "payment in progress"
         order.setStatus("paying");
+        order.setBankTransfer(bankTransfer);
         orderRepository.save(order);
     }
 

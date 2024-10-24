@@ -31,7 +31,7 @@ public class BankTransferService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 50000)
     public void processPendingTransfers() {
         // Step 1: Find all pending transfers
         List<BankTransfer> pendingTransfers = bankTransferRepository.findByStatus("pending");
