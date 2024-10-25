@@ -34,4 +34,20 @@ public class OrderWarehouse {
     public Integer getQuantity() {
         return quantity;
     }
+
+    // Setter for order
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    // Setter for warehouse
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
+    }
+    // Setter for quantity
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+
 }

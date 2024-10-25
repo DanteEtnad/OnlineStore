@@ -1,0 +1,6 @@
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999; /* 确保它位于其他元素的上方 */
+}

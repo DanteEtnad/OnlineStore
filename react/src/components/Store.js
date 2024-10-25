@@ -11,6 +11,7 @@ function Store() {
     const [quantities, setQuantities] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [orderDetails, setOrderDetails] = useState({});
+    const [stockError, setStockError] = useState(false); // 用于控制库存不足的弹窗
     const navigate = useNavigate(); // 用于跳转到支付页面
 
     // 获取所有产品数据
@@ -51,22 +52,30 @@ function Store() {
                     const { orderId, productName, totalAmount } = response.data.data; // 解构获取订单信息
                     const selectedProduct = products.find(product => product.productId === productId);
 
-                    // Check if totalAmount is defined
-                    if (totalAmount !== undefined) {
-                        // Set order details for the modal
-                        setOrderDetails({
-                            orderId, // 订单 ID
-                            productName, // 产品名称
-                            productId, // 产品 ID
-                            quantity, // 数量
-                            totalAmount, // 总金额
-                            customerId: user.customerId, // 客户 ID
-                            price: selectedProduct.price,
+                    // 调用库存分配接口，检查库存是否足够
+                    StoreDataService.allocateWarehouseForOrder(orderId)
+                        .then(allocateResponse => {
+                            if (allocateResponse.data.status === 'success') {
+                                // 如果库存足够，跳转到支付页面
+                                setOrderDetails({
+                                    orderId, // 订单 ID
+                                    productName, // 产品名称
+                                    productId, // 产品 ID
+                                    quantity, // 数量
+                                    totalAmount, // 总金额
+                                    customerId: user.customerId, // 客户 ID
+                                    price: selectedProduct.price,
+                                });
+                                setShowModal(true); // 显示弹窗
+                            } else {
+                                // 如果库存不足，显示错误弹窗
+                                setStockError(true);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Allocation error:', error);
+                            setStockError(true); // 显示库存不足弹窗
                         });
-                        setShowModal(true); // 显示弹窗
-                    } else {
-                        alert('Total amount is undefined');
-                    }
                 } else {
                     alert('Order failed');
                 }
@@ -77,6 +86,7 @@ function Store() {
     };
 
     const handleCloseModal = () => setShowModal(false);
+    const handleCloseStockError = () => setStockError(false); // 关闭库存不足弹窗
 
     return (
         <Container className="store-container mt-4">
@@ -117,8 +127,7 @@ function Store() {
                     <p><strong>Product ID:</strong> {orderDetails.productId}</p>
                     <p><strong>Quantity:</strong> {orderDetails.quantity}</p>
                     <p><strong>Price:</strong> {orderDetails.price}</p>
-                    <p><strong>Total
-                        Amount:</strong> ${orderDetails.totalAmount ? orderDetails.totalAmount.toFixed(2) : 'N/A'}</p>
+                    <p><strong>Total Amount:</strong> ${orderDetails.totalAmount ? orderDetails.totalAmount.toFixed(2) : 'N/A'}</p>
                     <p><strong>Customer ID:</strong> {orderDetails.customerId}</p>
                 </Modal.Body>
                 <Modal.Footer>
@@ -126,6 +135,19 @@ function Store() {
                     <Button variant="primary" onClick={() => navigate('/payment', { state: { ...orderDetails } })}>
                         Proceed to Payment
                     </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal for stock error */}
+            <Modal show={stockError} onHide={handleCloseStockError}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Stock Error</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Sorry, there is not enough stock to complete your order. Please try again later or choose a different product.</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseStockError}>Close</Button>
                 </Modal.Footer>
             </Modal>
         </Container>

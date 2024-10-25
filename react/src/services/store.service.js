@@ -72,6 +72,10 @@ class StoreDataService {
         return http.get(`/bank/customer/${customerId}`);
     }
 
+    allocateWarehouseForOrder(orderId) {
+        // 通过 GET 请求调用 allocate API 检查库存
+        return http.get(`/order-allocation/allocate/${orderId}`);
+    }
 
 
 }

@@ -1,73 +1,79 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Toast, ToastContainer } from 'react-bootstrap';
+import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '../context/AuthContext';
 
-// 创建 ToastContext
 const ToastContext = createContext();
 
-// 创建 ToastProvider，用于封装通知逻辑和 SSE 连接
 export const ToastProvider = ({ children }) => {
-    const [toasts, setToasts] = useState([]); // 用于存储多个 Toast
+    const { user } = useAuth();
+    const [toasts, setToasts] = useState([]);
+    const maxNotifications = 5;
 
-    // 函数用于检查是否是 JSON 数据
-    const isJson = (str) => {
-        try {
-            JSON.parse(str);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-
-    // 函数用于添加新的 Toast 到队列中
     const addToast = (message) => {
         setToasts((prevToasts) => [
             ...prevToasts,
-            { id: Date.now(), message }
+            { id: uuidv4(), message }
         ]);
     };
 
-    // SSE 连接处理通知
-    const connectNotificationSSE = (customerId) => {
-        const notificationEventSource = new EventSource(`http://localhost:8080/api/email/notifications/${customerId}`);
+    useEffect(() => {
+        if (!user?.customerId) return;
 
-        // 处理通知的 SSE
+        const notificationEventSource = new EventSource(`http://localhost:8080/api/email/notifications/${user.customerId}`);
+
         notificationEventSource.onmessage = (event) => {
             const notificationData = event.data;
-            console.log("New notification received:", notificationData); // 确保数据被正确接收
-            if (isJson(notificationData)) {
+            console.log("New notification received:", notificationData);
+
+            try {
                 const parsedNotifications = JSON.parse(notificationData);
-                parsedNotifications.forEach((notification) => {
-                    addToast(notification); // 每个新通知弹出一个 Toast
-                });
+
+                if (Array.isArray(parsedNotifications) && parsedNotifications.length > maxNotifications) {
+                    console.log(`Ignoring long notification array with ${parsedNotifications.length} items.`);
+                    return;
+                }
+
+                parsedNotifications.forEach((notification) => addToast(notification));
+            } catch (error) {
+                console.error("Failed to parse notification:", error);
             }
         };
 
-        // SSE连接关闭处理
         notificationEventSource.onclose = () => {
             console.log("Notification connection closed by server");
         };
 
-        // 错误处理
         notificationEventSource.onerror = (error) => {
             console.error("Error with notification SSE connection:", error);
             notificationEventSource.close();
         };
-    };
 
-    // 删除已显示的 Toast
+        return () => notificationEventSource.close();
+    }, [user?.customerId]);
+
     const removeToast = (id) => {
         setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
     };
 
     return (
-        <ToastContext.Provider value={{ connectNotificationSSE }}>
+        <ToastContext.Provider value={{ addToast }}>
             {children}
-            <ToastContainer position="bottom-end" className="p-3">
-                {toasts.map((toast) => (
+            <ToastContainer
+                position="bottom-end"
+                className="p-3"
+                style={{
+                    position: 'fixed', // 固定位置
+                    bottom: '20px',
+                    right: '20px',
+                    zIndex: 1050 // 确保 Toast 在最前层
+                }}
+            >
+                {toasts.slice(0, 3).map((toast) => (
                     <Toast
                         key={toast.id}
                         onClose={() => removeToast(toast.id)}
-                        show={true} // Always show each toast
+                        show={true}
                         delay={5000}
                         autohide
                     >
@@ -83,7 +89,4 @@ export const ToastProvider = ({ children }) => {
     );
 };
 
-// 创建自定义 Hook 来使用 ToastContext
-export const useToast = () => {
-    return useContext(ToastContext);
-};
+export const useToast = () => useContext(ToastContext);
