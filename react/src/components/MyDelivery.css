@@ -1,0 +1,21 @@
+.my-delivery-container {
+    padding: 20px;
+}
+
+.my-delivery-container h2 {
+    margin-bottom: 20px;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}

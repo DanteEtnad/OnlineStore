@@ -67,6 +67,13 @@ class StoreDataService {
         // 直接通过 POST 请求发送检查订单状态
         return http.post(`/store/${customerId}/checkOrderStatus/${orderId}`);
     }
+
+    getCustomerOrders(customerId) {
+        return http.get(`/bank/customer/${customerId}`);
+    }
+
+
+
 }
 
 

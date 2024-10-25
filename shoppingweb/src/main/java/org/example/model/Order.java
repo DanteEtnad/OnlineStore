@@ -49,6 +49,12 @@ public class Order {
         return status;
     }
 
+    // Getter for quantity
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+
     // Getter for customer
     public Customer getCustomer() {
         return customer;
