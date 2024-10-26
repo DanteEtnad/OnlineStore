@@ -50,7 +50,7 @@ function Payment() {
                             setIsPending(false); // Stop showing spinner
                             clearInterval(intervalId); // Stop polling
                         } else if (status === 'failed') {
-                            setPaymentStatus('Payment failed.');
+                            setPaymentStatus('Payment failed, insufficient balance.');
                             setIsPending(false);
                             clearInterval(intervalId);
                         } else {
