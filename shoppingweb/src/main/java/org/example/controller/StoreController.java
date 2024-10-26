@@ -58,7 +58,7 @@ public class StoreController {
         return productRepository.findAll();
     }
 
-    // Inner class for hash password
+    // Inner class for hashing password
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -131,28 +131,26 @@ public class StoreController {
             order.setProduct(product);
             order.setQuantity(quantity);
             order.setTotalAmount(totalAmount);
-            order.setOrderDate(LocalDateTime.now()); // 设置订单日期为当前时间
-            order.setCustomer(foundCustomer); // 设置客户信息
+            order.setOrderDate(LocalDateTime.now()); // Set order date to current time
+            order.setCustomer(foundCustomer); // Set customer information
 
             orderRepository.save(order);
 
             // Step 4: Return order information
             return new CustomerResponse<>("success", "Order placed successfully",
-                    new OrderResponse(foundCustomer.getCustomerId(), order.getOrderId(), product.getProductId(), product.getProductName(), quantity, product.getPrice(), totalAmount)); // 确保传递产品名称
+                    new OrderResponse(foundCustomer.getCustomerId(), order.getOrderId(), product.getProductId(), product.getProductName(), quantity, product.getPrice(), totalAmount)); // Ensure product name is passed
         } else {
             return new CustomerResponse<>("error", "Product or customer not found", null);
         }
     }
 
-
-
     @PostMapping("/{customerId}/{orderId}/payment")
     public CustomerResponse<Object> createPayment(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         try {
-            Long toAccountId = this.getStoreAccountId();  // 获取店铺账户ID
+            Long toAccountId = this.getStoreAccountId();  // Get store account ID
             BankTransfer bankTransfer = bankService.createPaymentBill(fromAccountId, toAccountId, orderId);
 
-            // 返回 bankTransferId 以便前端可以查询状态
+            // Return bankTransferId so the frontend can query the status
             return new CustomerResponse<>("success", "Payment initiated", bankTransfer.getBankTransferId());
         } catch (Exception e) {
             return new CustomerResponse<>("error", e.getMessage(), null);
@@ -170,9 +168,6 @@ public class StoreController {
         }
     }
 
-
-
-
     @PostMapping("/{customerId}/{orderId}/refund")
     public RefundResponse refundOrder(@PathVariable Long customerId, @PathVariable Long orderId, @RequestParam Long fromAccountId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
@@ -181,7 +176,7 @@ public class StoreController {
             Order order = optionalOrder.get();
 
             // Check if the order is eligible for a refund (paid)
-            if ( !(order.getStatus().equals("paying") || order.getStatus().equals("payed")) ) {
+            if (!(order.getStatus().equals("paying") || order.getStatus().equals("payed"))) {
                 return new RefundResponse(orderId, "Refund not possible. The order is not paid.");
             }
 
@@ -210,7 +205,7 @@ public class StoreController {
         }
     }
 
-    // Only by calling this function can the order status be changed to paid, and then the deliveryCo will detect the paid status and then delivery.
+    // Only by calling this function can the order status be changed to paid, and then the delivery company will detect the paid status and deliver.
     @PostMapping("/{customerId}/checkOrderStatus/{orderId}")
     public OrderStatusResponse checkOrderStatus(@PathVariable Long customerId, @PathVariable Long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
@@ -295,18 +290,18 @@ public class StoreController {
         private Long customerId;
         private Long orderId;
         private Long productId;
-        private String productName; // 添加产品名称
+        private String productName;
         private Integer quantity;
-        private Double unitPrice; // 单价
+        private Double unitPrice;
         private Double totalAmount;
 
         public OrderResponse(Long customerId, Long orderId, Long productId, String productName, Integer quantity, Double unitPrice, Double totalAmount) {
             this.customerId = customerId;
             this.orderId = orderId;
             this.productId = productId;
-            this.productName = productName; // 赋值产品名称
+            this.productName = productName;
             this.quantity = quantity;
-            this.unitPrice = unitPrice; // 赋值单价
+            this.unitPrice = unitPrice;
             this.totalAmount = totalAmount;
         }
 
@@ -323,7 +318,7 @@ public class StoreController {
         }
 
         public String getProductName() {
-            return productName; // 返回产品名称
+            return productName;
         }
 
         public Integer getQuantity() {
@@ -331,7 +326,7 @@ public class StoreController {
         }
 
         public Double getUnitPrice() {
-            return unitPrice; // 返回单价
+            return unitPrice;
         }
 
         public Double getTotalAmount() {

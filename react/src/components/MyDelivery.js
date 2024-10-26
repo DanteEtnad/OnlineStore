@@ -1,52 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Container, Row, Col, Modal, Button } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext'; // 用于获取用户信息
-import './MyDelivery.css'; // 你可以根据需要设计 CSS 样式
+import { useAuth } from '../context/AuthContext'; // To get user information
+import './MyDelivery.css'; // Customize CSS styles as needed
 
 function MyDelivery() {
-    const { user } = useAuth(); // 获取当前登录用户的信息
-    const [customerId, setCustomerId] = useState(null); // 用于保存 customerId
-    const [orders, setOrders] = useState([]); // 初始化为空数组，避免 map 错误
-    const [error, setError] = useState(null); // 用于处理错误信息
-    const [showModal, setShowModal] = useState(false); // 控制弹窗显示
-    const [lastOrderUpdateTime, setLastOrderUpdateTime] = useState(Date.now()); // 记录最后一次订单的更新时间
+    const { user } = useAuth(); // Get the information of the currently logged-in user
+    const [customerId, setCustomerId] = useState(null); // To store customerId
+    const [orders, setOrders] = useState([]); // Initialize as an empty array to avoid map errors
+    const [error, setError] = useState(null); // To handle error messages
+    const [showModal, setShowModal] = useState(false); // Control modal visibility
+    const [lastOrderUpdateTime, setLastOrderUpdateTime] = useState(Date.now()); // Record the last update time for orders
 
-    let orderTimer = null; // 用于订单更新超时的计时器
+    let orderTimer = null; // Timer to track order update timeout
 
-    // 在组件加载时检查 localStorage 中是否有保存的 customerId
+    // Check if there is a saved customerId in localStorage when the component loads
     useEffect(() => {
         if (user && user.customerId) {
             setCustomerId(user.customerId);
-            localStorage.setItem('customerId', user.customerId); // 将 customerId 保存到 localStorage
+            localStorage.setItem('customerId', user.customerId); // Save customerId to localStorage
         } else {
             const storedCustomerId = localStorage.getItem('customerId');
             if (storedCustomerId) {
-                setCustomerId(storedCustomerId); // 如果 localStorage 中有保存的 customerId，则恢复该值
+                setCustomerId(storedCustomerId); // Restore customerId if it exists in localStorage
             }
         }
     }, [user]);
 
-    // 函数用于重置订单更新计时器
+    // Function to reset the order update timer
     const resetOrderTimer = () => {
         clearTimeout(orderTimer);
         orderTimer = setTimeout(() => {
-            setShowModal(true); // 显示弹窗，表示30秒内没有更新订单
-        }, 30000); // 30秒没有更新则触发
+            setShowModal(true); // Show modal if no order update within 30 seconds
+        }, 30000); // Trigger after 30 seconds
     };
 
-    // 函数用于重置订单更新计时器并刷新 SSE 连接
+    // Function to reset the order update timer and refresh the SSE connection
     const refreshOrderConnection = () => {
-        // 清除现有计时器
+        // Clear existing timer
         clearTimeout(orderTimer);
-        setShowModal(false); // 关闭弹窗
+        setShowModal(false); // Close modal
 
-        // 模拟重新加载页面，强制刷新订单数据
-        const newCustomerId = customerId; // 保存当前 customerId
-        setCustomerId(null); // 暂时清除 customerId，强制 useEffect 重新运行
-        setTimeout(() => setCustomerId(newCustomerId), 0); // 重新设置 customerId，触发 useEffect 重新连接 SSE
+        // Simulate reloading the page to force order data refresh
+        const newCustomerId = customerId; // Save current customerId
+        setCustomerId(null); // Temporarily clear customerId to force useEffect to re-run
+        setTimeout(() => setCustomerId(newCustomerId), 0); // Reset customerId to trigger SSE reconnection
     };
 
-    // 使用 effect 只处理订单逻辑
+    // Use effect to handle order logic only
     useEffect(() => {
         if (customerId) {
             const orderEventSource = new EventSource(`http://localhost:8080/api/bank/customer/${customerId}`);
@@ -57,31 +57,31 @@ function MyDelivery() {
                     const parsedData = JSON.parse(receivedData);
                     console.log("Received orders:", parsedData);
                     setOrders(parsedData);
-                    setLastOrderUpdateTime(Date.now()); // 更新最后的订单更新时间
-                    resetOrderTimer(); // 重置订单更新计时器
+                    setLastOrderUpdateTime(Date.now()); // Update last order update time
+                    resetOrderTimer(); // Reset order update timer
                 } else {
                     console.log("Non-JSON data received:", receivedData);
                 }
             };
 
-            // SSE连接关闭处理
+            // Handle SSE connection closure
             orderEventSource.onclose = () => {
                 console.log("Order connection closed by server");
-                setShowModal(true); // 显示订单连接断开提示
+                setShowModal(true); // Show disconnection prompt
             };
 
-            // 错误处理
+            // Error handling
             orderEventSource.onerror = (error) => {
                 console.error("Error with order SSE connection:", error);
                 setError('Error receiving data from server.');
-                setShowModal(true); // 显示连接中断提示
+                setShowModal(true); // Show disconnection prompt
                 orderEventSource.close();
             };
 
-            // 清除 SSE 连接和计时器
+            // Clean up SSE connection and timer
             return () => {
                 orderEventSource.close();
-                clearTimeout(orderTimer); // 清除订单计时器
+                clearTimeout(orderTimer); // Clear order timer
             };
         }
     }, [customerId]);
@@ -114,7 +114,7 @@ function MyDelivery() {
                 )}
             </Row>
 
-            {/* 连接中断提示弹窗 */}
+            {/* Disconnection prompt modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Connection Lost</Modal.Title>

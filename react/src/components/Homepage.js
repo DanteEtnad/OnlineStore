@@ -1,22 +1,22 @@
 import React from 'react';
 import { Container, Button, Row, Col, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import './Homepage.css'; // 引入样式文件
+import './Homepage.css'; // Import stylesheet
 
 function Home() {
     const navigate = useNavigate();
 
-    // 跳转到登录页面
+    // Navigate to the login page
     const handleLoginClick = () => {
         navigate('/login');
     };
 
-    // 跳转到注册页面
+    // Navigate to the registration page
     const handleRegisterClick = () => {
         navigate('/register');
     };
 
-    // 跳转到产品预览页面
+    // Navigate to the product preview page
     const handleProductPreviewClick = () => {
         navigate('/products');
     };
@@ -29,7 +29,7 @@ function Home() {
                     Discover a variety of products tailored to your needs. Our platform offers the best deals and exclusive discounts just for you. Sign up now and start shopping today!
                 </p>
 
-                {/* 快捷入口按钮 */}
+                {/* Quick access buttons */}
                 <div className="home-buttons">
                     <Button variant="primary" onClick={handleLoginClick} className="home-button">
                         Login
@@ -39,7 +39,7 @@ function Home() {
                     </Button>
                 </div>
 
-                {/* 平台特色 */}
+                {/* Platform features */}
                 <h2>Platform Features</h2>
                 <Row className="features-section">
                     <Col md={4}>
@@ -74,7 +74,7 @@ function Home() {
                     </Col>
                 </Row>
 
-                {/* 产品预览 */}
+                {/* Product previews */}
                 <h2>Product Previews</h2>
                 <p>
                     Check out some of our popular products before signing up. Click the button below to explore our collection.

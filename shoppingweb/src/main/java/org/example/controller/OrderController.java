@@ -13,8 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.Objects;
 
-
-
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/bank")
@@ -39,7 +37,7 @@ public class OrderController {
         return new OrderStatusResponse(order.getOrderId(), order.getStatus());
     }
 
-    // 根据 customerId 获取该客户所有订单的状态
+    // Get the status of all orders for a specific customer by customerId
     @GetMapping("/status/customer/{customerId}")
     public List<OrderStatusResponse> getOrderStatusesByCustomerId(@PathVariable Long customerId) {
         return orderRepository.findByCustomer_CustomerId(customerId).stream()
@@ -47,7 +45,7 @@ public class OrderController {
                 .collect(Collectors.toList());
     }
 
-    // 获取所有订单的详细信息
+    // Get detailed information for all orders
     @GetMapping("/orders")
     public List<OrderDetailResponse> getAllOrders() {
         return orderRepository.findAll().stream()
@@ -65,20 +63,19 @@ public class OrderController {
                 .collect(Collectors.toList());
     }
 
-
-
+    // Stream orders for a specific customer by customerId
     @GetMapping("/customer/{customerId}")
     public SseEmitter streamOrdersByCustomerId(@PathVariable Long customerId) {
-        SseEmitter emitter = new SseEmitter(3600000L); // 设置1小时超时
+        SseEmitter emitter = new SseEmitter(3600000L); // Set 1-hour timeout
 
         new Thread(() -> {
             try {
-                // 记录上一次的订单列表
+                // Record the previous list of orders
                 List<OrderDetailResponse> lastOrders = null;
                 long lastUpdateTime = System.currentTimeMillis();
 
                 while (true) {
-                    // 获取当前订单
+                    // Get current orders
                     List<OrderDetailResponse> currentOrders = orderRepository.findByCustomer_CustomerId(customerId).stream()
                             .sorted(Comparator.comparing(Order::getOrderId))
                             .map(order -> new OrderDetailResponse(
@@ -93,24 +90,24 @@ public class OrderController {
                             ))
                             .collect(Collectors.toList());
 
-                    // 检查当前订单列表是否与上次发送的订单相同（内容比较而不是引用比较）
+                    // Check if the current list of orders is the same as the last sent orders (content comparison, not reference comparison)
                     if (!areOrdersEqual(lastOrders, currentOrders)) {
-                        emitter.send(currentOrders); // 如果有变化则发送数据
-                        lastOrders = currentOrders; // 更新最后一次的订单数据
-                        lastUpdateTime = System.currentTimeMillis(); // 更新最后的更新时间
+                        emitter.send(currentOrders); // Send data if there are changes
+                        lastOrders = currentOrders; // Update the last order data
+                        lastUpdateTime = System.currentTimeMillis(); // Update last update time
                     }
 
-                    // 每 5 秒检查一次变化
+                    // Check for changes every 5 seconds
                     Thread.sleep(5000);
 
-                    // 如果超过30秒没有更新，直接关闭连接，不发送任何消息
+                    // Close connection if there are no updates for more than 30 seconds, without sending any message
                     if (System.currentTimeMillis() - lastUpdateTime > 30000) {
-                        emitter.complete(); // 关闭连接，不发送额外消息
+                        emitter.complete(); // Close connection without sending additional messages
                         break;
                     }
                 }
             } catch (IOException | InterruptedException e) {
-                emitter.completeWithError(e);  // 处理异常并结束 SSE 会话
+                emitter.completeWithError(e);  // Handle exception and end SSE session
             }
         }).start();
 
@@ -118,7 +115,7 @@ public class OrderController {
     }
 
     /**
-     * 自定义比较函数，比较两个订单列表的内容是否相同
+     * Custom comparison function to check if two lists of orders are the same in content
      */
     private boolean areOrdersEqual(List<OrderDetailResponse> lastOrders, List<OrderDetailResponse> currentOrders) {
         if (lastOrders == null && currentOrders == null) {
@@ -128,7 +125,7 @@ public class OrderController {
             return false;
         }
 
-        // 比较每个订单的关键信息
+        // Compare key information of each order
         for (int i = 0; i < lastOrders.size(); i++) {
             OrderDetailResponse lastOrder = lastOrders.get(i);
             OrderDetailResponse currentOrder = currentOrders.get(i);
@@ -139,15 +136,12 @@ public class OrderController {
                     !Objects.equals(lastOrder.getTotalAmount(), currentOrder.getTotalAmount()) ||
                     !Objects.equals(lastOrder.getProductId(), currentOrder.getProductId()) ||
                     !Objects.equals(lastOrder.getBankTransferId(), currentOrder.getBankTransferId())) {
-                return false; // 如果任意字段不同，则认为列表不同
+                return false; // Lists are considered different if any field differs
             }
         }
 
-        return true; // 所有字段相同，认为列表相等
+        return true; // Lists are considered equal if all fields are the same
     }
-
-
-
 
     // Internal Classes for Responding to Order Status
     public static class OrderStatusResponse {
@@ -162,7 +156,6 @@ public class OrderController {
         public Long getOrderId() {return orderId;}
         public String getStatus() {return status;}
     }
-
 
     public static class OrderDetailResponse {
         private Long orderId;
@@ -218,6 +211,4 @@ public class OrderController {
             return productId;
         }
     }
-
-
 }

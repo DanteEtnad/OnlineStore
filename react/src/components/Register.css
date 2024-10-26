@@ -5,24 +5,24 @@
     align-items: center;
     min-height: 100vh;
     padding: 20px;
-    background-color: #f9f9f9; /* 灰色背景让页面更柔和 */
+    background-color: #f9f9f9; /* Gray background for a softer look */
 }
 
 /* Container for the form */
 .register-form-container {
     width: 100%;
-    max-width: 450px; /* 增加容器的最大宽度 */
-    padding: 30px; /* 增加内边距让表单更有空间 */
-    border-radius: 8px; /* 调整边角使其更圆滑 */
-    box-shadow: 0 0 15px rgba(0,0,0,0.1); /* 轻微阴影让表单更突出 */
-    background-color: #ffffff; /* 背景颜色为白色 */
+    max-width: 450px; /* Increase maximum container width */
+    padding: 30px; /* Increase padding for more space around the form */
+    border-radius: 8px; /* Adjust corner radius for a smoother look */
+    box-shadow: 0 0 15px rgba(0,0,0,0.1); /* Subtle shadow to make the form stand out */
+    background-color: #ffffff; /* White background color */
 }
 
 /* Title styling */
 .register-title {
     text-align: center;
-    font-size: 1.5rem; /* 标题的大小更醒目 */
-    font-weight: bold; /* 标题加粗 */
+    font-size: 1.5rem; /* Larger font size for emphasis */
+    font-weight: bold; /* Bold the title */
     margin-bottom: 20px;
 }
 
@@ -34,18 +34,18 @@
 /* Register button styling */
 .register-button {
     width: 100%;
-    padding: 10px; /* 增加按钮的上下内边距 */
-    font-size: 1.2rem; /* 提高字体大小 */
-    font-weight: bold; /* 加粗字体 */
-    background-color: #28a745; /* 使用Bootstrap默认的success颜色 */
-    border: none; /* 移除默认的边框 */
-    border-radius: 5px; /* 圆角按钮 */
-    transition: background-color 0.3s ease; /* 增加按钮颜色的渐变效果 */
+    padding: 10px; /* Increase top and bottom padding */
+    font-size: 1.2rem; /* Increase font size */
+    font-weight: bold; /* Bold font */
+    background-color: #28a745; /* Use Bootstrap's default success color */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded button */
+    transition: background-color 0.3s ease; /* Add smooth color transition */
 }
 
 /* Button hover effect */
 .register-button:hover {
-    background-color: #218838; /* 调整hover颜色更深一点 */
+    background-color: #218838; /* Darker hover color */
     border-color: #1e7e34;
 }
 
@@ -67,10 +67,10 @@
 /* Responsive design for smaller devices */
 @media (max-width: 768px) {
     .register-form-container {
-        padding: 20px; /* 减少小屏幕上的内边距 */
+        padding: 20px; /* Reduce padding on smaller screens */
     }
 
     .register-button {
-        font-size: 1rem; /* 小屏幕上调整字体大小 */
+        font-size: 1rem; /* Adjust font size on smaller screens */
     }
 }

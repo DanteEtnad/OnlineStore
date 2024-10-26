@@ -24,31 +24,31 @@ public class EmailController {
 
     @GetMapping("/notifications/{customerId}")
     public SseEmitter streamNotificationsForCustomer(@PathVariable Long customerId) {
-        SseEmitter emitter = new SseEmitter(300000L); // 5分钟超时
+        SseEmitter emitter = new SseEmitter(300000L); // 5-minute timeout
 
         new Thread(() -> {
             try {
-                List<String> lastNotifications = new ArrayList<>(); // 初始化为空
+                List<String> lastNotifications = new ArrayList<>(); // Initialize as empty
                 long lastUpdateTime = System.currentTimeMillis();
 
                 while (true) {
-                    // 获取当前通知
+                    // Get current notifications
                     List<String> currentNotifications = emailService.getNotificationsForCustomer(customerId);
 
-                    // 获取增量通知
+                    // Get incremental notifications
                     List<String> newNotifications = getNewNotifications(lastNotifications, currentNotifications);
 
-                    // 如果有新增通知，发送
+                    // Send if there are new notifications
                     if (!newNotifications.isEmpty()) {
                         emitter.send(newNotifications);
                         lastNotifications = new ArrayList<>(currentNotifications);
                         lastUpdateTime = System.currentTimeMillis();
                     }
 
-                    // 每隔5秒检查一次
+                    // Check every 5 seconds
                     Thread.sleep(5000);
 
-                    // 超过5分钟没有变化，关闭连接
+                    // Close connection if no changes for more than 5 minutes
                     if (System.currentTimeMillis() - lastUpdateTime > 300000) {
                         emitter.complete();
                         break;
@@ -62,12 +62,12 @@ public class EmailController {
         return emitter;
     }
 
-    // 返回新增的通知
+    // Return new notifications
     private List<String> getNewNotifications(List<String> lastNotifications, List<String> currentNotifications) {
         if (lastNotifications == null || lastNotifications.isEmpty()) {
-            return new ArrayList<>(currentNotifications); // 如果之前为空，返回所有当前通知
+            return new ArrayList<>(currentNotifications); // Return all current notifications if previous was empty
         }
-        // 找出新增的通知
+        // Find new notifications
         List<String> newNotifications = new ArrayList<>();
         for (int i = lastNotifications.size(); i < currentNotifications.size(); i++) {
             newNotifications.add(currentNotifications.get(i));

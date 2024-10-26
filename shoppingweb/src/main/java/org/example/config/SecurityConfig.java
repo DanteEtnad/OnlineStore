@@ -14,10 +14,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/store/register").permitAll() // 注册请求无需身份验证
-                        .anyRequest().permitAll() // 其他所有请求不需要身份验证
+                        .requestMatchers("/api/store/register").permitAll() // Registration requests do not require authentication
+                        .anyRequest().permitAll() // All other requests do not require authentication
                 )
-                .csrf(csrf -> csrf.disable()); // 禁用 CSRF 保护（仅在确实需要时使用）
+                .csrf(csrf -> csrf.disable()); // Disable CSRF protection (use only if necessary)
 
         return http.build();
     }

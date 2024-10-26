@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import StoreDataService from '../services/store.service'; // 导入服务
+import StoreDataService from '../services/store.service'; // Import service
 import { Card, Button, InputGroup, FormControl, Container, Row, Col, Modal } from 'react-bootstrap';
 import './Store.css';
-import { useAuth } from '../context/AuthContext'; // 导入认证上下文，用于获取用户信息
-import { useNavigate } from 'react-router-dom'; // 导入用于跳转的导航钩子
+import { useAuth } from '../context/AuthContext'; // Import authentication context to get user information
+import { useNavigate } from 'react-router-dom'; // Import navigation hook for redirects
 
 function Store() {
-    const { user } = useAuth(); // 获取当前登录用户的信息
+    const { user } = useAuth(); // Get information of the currently logged-in user
     const [products, setProducts] = useState([]);
     const [quantities, setQuantities] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [orderDetails, setOrderDetails] = useState({});
-    const [stockError, setStockError] = useState(false); // 用于控制库存不足的弹窗
-    const navigate = useNavigate(); // 用于跳转到支付页面
+    const [stockError, setStockError] = useState(false); // To control stock error modal
+    const navigate = useNavigate(); // For navigating to the payment page
 
-    // 获取所有产品数据
+    // Get all product data
     useEffect(() => {
         StoreDataService.getAllProducts()
             .then(response => {
@@ -30,7 +30,7 @@ function Store() {
             });
     }, []);
 
-    // 处理数量变化
+    // Handle quantity change
     const handleQuantityChange = (productId, newQuantity) => {
         setQuantities(prevQuantities => ({
             ...prevQuantities,
@@ -38,7 +38,7 @@ function Store() {
         }));
     };
 
-    // 调用 store.service.js 中的 placeOrder 函数进行下单
+    // Place an order by calling the placeOrder function in store.service.js
     const handleBuy = (productId) => {
         const quantity = quantities[productId];
         if (!user) {
@@ -49,32 +49,32 @@ function Store() {
         StoreDataService.placeOrder(user.customerId, productId, quantity)
             .then(response => {
                 if (response.data.status === 'success') {
-                    const { orderId, productName, totalAmount } = response.data.data; // 解构获取订单信息
+                    const { orderId, productName, totalAmount } = response.data.data; // Destructure order information
                     const selectedProduct = products.find(product => product.productId === productId);
 
-                    // 调用库存分配接口，检查库存是否足够
+                    // Call stock allocation API to check if enough stock is available
                     StoreDataService.allocateWarehouseForOrder(orderId)
                         .then(allocateResponse => {
                             if (allocateResponse.data.status === 'success') {
-                                // 如果库存足够，跳转到支付页面
+                                // If stock is sufficient, navigate to payment page
                                 setOrderDetails({
-                                    orderId, // 订单 ID
-                                    productName, // 产品名称
-                                    productId, // 产品 ID
-                                    quantity, // 数量
-                                    totalAmount, // 总金额
-                                    customerId: user.customerId, // 客户 ID
+                                    orderId, // Order ID
+                                    productName, // Product name
+                                    productId, // Product ID
+                                    quantity, // Quantity
+                                    totalAmount, // Total amount
+                                    customerId: user.customerId, // Customer ID
                                     price: selectedProduct.price,
                                 });
-                                setShowModal(true); // 显示弹窗
+                                setShowModal(true); // Show modal
                             } else {
-                                // 如果库存不足，显示错误弹窗
+                                // If stock is insufficient, display error modal
                                 setStockError(true);
                             }
                         })
                         .catch(error => {
                             console.error('Allocation error:', error);
-                            setStockError(true); // 显示库存不足弹窗
+                            setStockError(true); // Show stock error modal
                         });
                 } else {
                     alert('Order failed');
@@ -86,7 +86,7 @@ function Store() {
     };
 
     const handleCloseModal = () => setShowModal(false);
-    const handleCloseStockError = () => setStockError(false); // 关闭库存不足弹窗
+    const handleCloseStockError = () => setStockError(false); // Close stock error modal
 
     return (
         <Container className="store-container mt-4">

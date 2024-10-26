@@ -63,10 +63,10 @@ export const ToastProvider = ({ children }) => {
                 position="bottom-end"
                 className="p-3"
                 style={{
-                    position: 'fixed', // 固定位置
+                    position: 'fixed', // Fixed position
                     bottom: '20px',
                     right: '20px',
-                    zIndex: 1050 // 确保 Toast 在最前层
+                    zIndex: 1050 // Ensure Toast is at the top layer
                 }}
             >
                 {toasts.slice(0, 3).map((toast) => (

@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Container, Form, Alert, Spinner } from 'react-bootstrap';
-import StoreDataService from '../services/store.service'; // 导入服务
+import StoreDataService from '../services/store.service'; // Import service
 import './Payment.css';
 
 function Payment() {
     const location = useLocation();
-    const navigate = useNavigate(); // 用于页面跳转
-    const { orderId, productId, quantity, productName, price, totalAmount, customerId } = location.state || {}; // 从路由状态中获取订单信息
-    const [accountId, setAccountId] = useState(''); // 用户输入的账户ID
-    const [paymentStatus, setPaymentStatus] = useState(''); // 支付状态信息
-    const [bankTransferId, setBankTransferId] = useState(null); // 用于存储支付的 bankTransferId
-    const [isPending, setIsPending] = useState(false); // 控制是否显示 pending 状态的转圈
+    const navigate = useNavigate(); // For page navigation
+    const { orderId, productId, quantity, productName, price, totalAmount, customerId } = location.state || {}; // Retrieve order information from route state
+    const [accountId, setAccountId] = useState(''); // User-entered account ID
+    const [paymentStatus, setPaymentStatus] = useState(''); // Payment status message
+    const [bankTransferId, setBankTransferId] = useState(null); // Store bankTransferId of the payment
+    const [isPending, setIsPending] = useState(false); // Controls whether to show pending spinner
 
-    // 处理支付
+    // Handle payment
     const handlePayment = () => {
         if (!accountId) {
             alert('Please enter your account ID.');
             return;
         }
 
-        // 调用服务方法发起支付请求
-        StoreDataService.createPayment(customerId, orderId, accountId) // 确保传递正确的参数
+        // Call service method to initiate payment request
+        StoreDataService.createPayment(customerId, orderId, accountId) // Ensure correct parameters are passed
             .then(response => {
                 if (response.data.status === 'success') {
                     const transferId = response.data.data;
-                    setBankTransferId(transferId); // 存储 transferId
-                    setIsPending(true); // 设置为 pending 状态
+                    setBankTransferId(transferId); // Store transferId
+                    setIsPending(true); // Set to pending state
                     setPaymentStatus('Payment initiated. Checking status...');
-                    pollPaymentStatus(transferId); // 开始轮询支付状态
+                    pollPaymentStatus(transferId); // Start polling payment status
                 } else {
                     setPaymentStatus(`Payment failed: ${response.data.message}`);
                 }
@@ -38,7 +38,7 @@ function Payment() {
             });
     };
 
-    // 轮询支付状态函数
+    // Function to poll payment status
     const pollPaymentStatus = (transferId) => {
         const intervalId = setInterval(() => {
             StoreDataService.getPaymentStatus(transferId)
@@ -47,8 +47,8 @@ function Payment() {
                         const status = response.data.data;
                         if (status === 'completed') {
                             setPaymentStatus('Payment completed successfully!');
-                            setIsPending(false); // 停止显示转圈
-                            clearInterval(intervalId); // 停止轮询
+                            setIsPending(false); // Stop showing spinner
+                            clearInterval(intervalId); // Stop polling
                         } else if (status === 'failed') {
                             setPaymentStatus('Payment failed.');
                             setIsPending(false);
@@ -62,17 +62,17 @@ function Payment() {
                     setPaymentStatus(`Error checking payment status: ${error.message}`);
                     clearInterval(intervalId);
                 });
-        }, 3000); // 每3秒检查一次状态
+        }, 3000); // Check status every 3 seconds
     };
 
-    // 处理退款请求
+    // Handle refund request
     const handleRefund = () => {
-        StoreDataService.refundOrder(customerId, orderId, accountId) // 确保传递 customerId, orderId 和 accountId
+        StoreDataService.refundOrder(customerId, orderId, accountId) // Ensure customerId, orderId, and accountId are passed
             .then(response => {
                 const { message } = response.data;
                 if (message === 'Refund initiated successfully.') {
                     alert('Refund successful!');
-                    // 跳转到商店页面
+                    // Navigate to the store page
                     navigate('/store');
                 } else {
                     alert('Refund failed: ' + message);
@@ -83,14 +83,14 @@ function Payment() {
             });
     };
 
-    // 处理订单确认
+    // Handle order confirmation
     const handleConfirm = () => {
         StoreDataService.checkOrderStatus(customerId, orderId)
             .then(response => {
                 const { message } = response.data;
                 if (response.data.status === 'order changed to paid') {
                     alert(message);
-                    // 跳转到 MyDelivery 页面
+                    // Navigate to MyDelivery page
                     navigate('/my-delivery');
                 } else {
                     alert('Order confirmation failed: ' + message);
@@ -145,10 +145,10 @@ function Payment() {
                 <Button variant="success" onClick={handlePayment} className="mt-3">
                     Pay Now
                 </Button>
-                {isPending && <Spinner animation="border" className="mt-3" />} {/* 显示转圈 */}
+                {isPending && <Spinner animation="border" className="mt-3" />} {/* Show spinner */}
                 {paymentStatus && <Alert variant="info" className="mt-3">{paymentStatus}</Alert>}
 
-                {/* 显示退款和确认订单选项，只在支付成功后显示 */}
+                {/* Show refund and confirm order options only after successful payment */}
                 {bankTransferId && paymentStatus === 'Payment completed successfully!' && (
                     <div className="mt-4">
                         <Button variant="danger" onClick={handleRefund} className="mr-2">

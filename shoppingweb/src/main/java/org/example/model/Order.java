@@ -12,27 +12,27 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "customerId")
-    private Customer customer;  // 客户对象
+    private Customer customer;  // Customer object
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "productId")
-    private Product product;  // 产品对象
+    private Product product;  // Product object
 
     @ManyToOne
     @JoinColumn(name = "bank_transfer_id", referencedColumnName = "bankTransferId")
-    private BankTransfer bankTransfer;  // 银行转账对象
+    private BankTransfer bankTransfer;  // Bank transfer object
 
     @Column(nullable = false)
-    private LocalDateTime orderDate;  // 订单日期
+    private LocalDateTime orderDate;  // Order date
 
     @Column(nullable = false)
-    private Integer quantity;  // 订单数量
+    private Integer quantity;  // Order quantity
 
     @Column(nullable = false)
-    private Double totalAmount;  // 订单总金额
+    private Double totalAmount;  // Order total amount
 
     @Column(nullable = false)
-    private String status = "pending";  // 订单状态
+    private String status = "pending";  // Order status
 
     // Getter for orderId
     public Long getOrderId() {
@@ -53,7 +53,6 @@ public class Order {
     public Integer getQuantity() {
         return quantity;
     }
-
 
     // Getter for customer
     public Customer getCustomer() {
@@ -106,7 +105,7 @@ public class Order {
     }
 
     // Setter for customer
-    public void setCustomer(Customer customer) { // 添加 setCustomer 方法
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 }

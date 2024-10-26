@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import StoreDataService from "../services/store.service"; // 导入用户服务用于API请求
-import { useAuth } from '../context/AuthContext'; // 使用 useAuth 代替 AuthContext
-import './Login.css'; // 导入样式
+import StoreDataService from "../services/store.service"; // Import user service for API requests
+import { useAuth } from '../context/AuthContext'; // Use useAuth instead of AuthContext
+import './Login.css'; // Import stylesheet
 
 function Login() {
-    const [username, setUsername] = useState(''); // 存储用户名
-    const [password, setPassword] = useState(''); // 存储密码
-    const [errorMessage, setErrorMessage] = useState(''); // 错误消息
-    const [submitted, setSubmitted] = useState(false); // 跟踪表单是否提交成功
-    const { login } = useAuth(); // 从 useAuth 中获取 login 函数
-    const navigate = useNavigate(); // 用于页面重定向
+    const [username, setUsername] = useState(''); // Store username
+    const [password, setPassword] = useState(''); // Store password
+    const [errorMessage, setErrorMessage] = useState(''); // Error message
+    const [submitted, setSubmitted] = useState(false); // Track if form submission was successful
+    const { login } = useAuth(); // Get login function from useAuth
+    const navigate = useNavigate(); // For page redirection
 
-    // 处理表单提交
+    // Handle form submission
     const handleLogin = (e) => {
         e.preventDefault();
 
-        // 验证字段是否为空
+        // Validate if fields are empty
         if (!username || !password) {
             setErrorMessage("All fields are required!");
             return;
         }
 
-        // 发送登录请求
+        // Send login request
         StoreDataService.login(username, password)
             .then(response => {
                 if (response.data.status === 'error') {
@@ -33,11 +33,11 @@ function Login() {
                     setSubmitted(true);
                     setErrorMessage("");
 
-                    // 确保将完整的用户数据（例如 customerId）保存到 AuthContext
-                    const userData = response.data.data; // 假设 response.data.data 包含 customerId 和其他用户信息
-                    login(userData); // 这里的 data 现在包含 customerId 和 name
+                    // Ensure complete user data (e.g., customerId) is saved in AuthContext
+                    const userData = response.data.data; // Assuming response.data.data contains customerId and other user information
+                    login(userData); // Here, data now contains customerId and name
 
-                    // 跳转到 store 页面
+                    // Navigate to the store page
                     navigate('/store');
                 }
             })

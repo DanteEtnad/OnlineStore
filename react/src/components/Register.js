@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import StoreDataService from "../services/store.service"; // 导入API请求服务
-import './Register.css'; // 导入样式
+import StoreDataService from "../services/store.service"; // Import API request service
+import './Register.css'; // Import styles
 
 function Register() {
-    const [username, setUsername] = useState(''); // 存储用户名
-    const [email, setEmail] = useState(''); // 存储邮箱
-    const [password, setPassword] = useState(''); // 存储密码
-    const [errorMessage, setErrorMessage] = useState(''); // 错误消息
-    const [submitted, setSubmitted] = useState(false); // 跟踪表单是否提交成功
-    const [showModal, setShowModal] = useState(false); // 控制模态框显示
-    const navigate = useNavigate(); // 用于页面跳转
+    const [username, setUsername] = useState(''); // Store username
+    const [email, setEmail] = useState(''); // Store email
+    const [password, setPassword] = useState(''); // Store password
+    const [errorMessage, setErrorMessage] = useState(''); // Error message
+    const [submitted, setSubmitted] = useState(false); // Track form submission success
+    const [showModal, setShowModal] = useState(false); // Control modal display
+    const navigate = useNavigate(); // For page navigation
 
-    // 处理表单提交
+    // Handle form submission
     const handleRegister = (e) => {
         e.preventDefault();
 
-        // 验证字段是否为空
+        // Validate if fields are empty
         if (!username || !email || !password) {
             setErrorMessage("All fields are required!");
             return;
         }
 
-        // 构造用户数据
+        // Construct user data
         const userData = {
             name: username,
             email,
             password,
         };
 
-        // 发送注册请求
+        // Send registration request
         StoreDataService.register(userData.name, userData.email, userData.password)
             .then(response => {
                 const { status, message } = response.data;
@@ -38,30 +38,30 @@ function Register() {
                 if (status === "success") {
                     console.log("Registration successful:", response.data);
                     setSubmitted(true);
-                    setErrorMessage(""); // 清空错误消息
+                    setErrorMessage(""); // Clear error message
 
-                    // 显示成功模态框
+                    // Show success modal
                     setShowModal(true);
                 } else {
-                    // 如果返回的是错误信息，则显示错误信息
+                    // Display error message if returned
                     setErrorMessage(message || "Registration failed, please try again later.");
-                    setSubmitted(false); // 确保不会显示注册成功
+                    setSubmitted(false); // Ensure success message is not displayed
                 }
             })
             .catch(e => {
-                // 处理注册错误，确保仅显示可读的错误消息
+                // Handle registration error and ensure readable error messages are displayed
                 const errorResponse = e.response?.data;
                 const errorMsg = typeof errorResponse === 'string' ? errorResponse : "Registration failed, please try again later.";
                 setErrorMessage(errorMsg);
-                setSubmitted(false); // 确保不会显示注册成功
+                setSubmitted(false); // Ensure success message is not displayed
                 console.error("Registration error:", e.response?.data || e.message);
             });
     };
 
-    // 关闭模态框并跳转到登录页面
+    // Close modal and navigate to login page
     const handleModalClose = () => {
         setShowModal(false);
-        navigate('/login'); // 跳转到登录页面
+        navigate('/login'); // Navigate to login page
     };
 
     return (
@@ -96,7 +96,7 @@ function Register() {
                         <Form.Group controlId="formBasicEmail" className="mb-3">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
-                                type="email" // 使用 "email" 类型来验证邮箱格式
+                                type="email" // Use "email" type to validate email format
                                 placeholder="Enter email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -127,7 +127,7 @@ function Register() {
                     </Form>
                 )}
 
-                {/* 模态框显示注册成功 */}
+                {/* Modal displaying successful registration */}
                 <Modal show={showModal} onHide={handleModalClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Registration Successful</Modal.Title>
