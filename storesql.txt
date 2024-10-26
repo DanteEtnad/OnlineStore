@@ -31,3 +31,28 @@ CREATE TABLE Warehouse (
     id SERIAL PRIMARY KEY,
     warehouse_id STRING,        -- Warehouse ID
     product_id INT NOT NULL,          -- Foreign key, corresponding to product_id in Product table
+    product_id INT NOT NULL,          -- Foreign key, linked to product_id in the Products table
+    stock_level INT NOT NULL,         -- Stock quantity
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+CREATE TABLE Order (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL,         -- Foreign key, linked to the Customers table
+    product_id INT NOT NULL,          -- Foreign key, linked to the Products table
+    bank_transfer_id INT NOT NULL,    -- Foreign key, linked to the BankTransfer table
+    order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Order date
+    quantity INT NOT NULL,            -- Quantity of product
+    total_amount DECIMAL(10, 2) NOT NULL, -- Total order amount
+    status VARCHAR(50) NOT NULL DEFAULT 'pending', -- Order status, starting as "pending" (options: paying, payed, packaged, on the way, delivered, finished, refunded)
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+CREATE TABLE OrderWarehouse (
+    id  SERIAL PRIMARY KEY,
+    order_id INT NOT NULL,            -- Foreign key, linked to the Orders table
+    warehouse_id STRING,              -- Warehouse ID
+    quantity INT NOT NULL,            -- Quantity of products shipped from this warehouse for the order
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
+);
